@@ -58,6 +58,7 @@ export const examsApi = {
 
   // Admin
   list: () => api.get("/exams/"),
+  get: (id: number) => api.get(`/exams/${id}/`),
   create: (data: object) => api.post("/exams/", data),
   update: (id: number, data: object) => api.patch(`/exams/${id}/`, data),
   delete: (id: number) => api.delete(`/exams/${id}/`),
@@ -99,6 +100,9 @@ export const sessionsApi = {
   // Admin
   activeSessions: () => api.get("/sessions/active/"),
   terminate: (sessionId: number) => api.post(`/sessions/${sessionId}/terminate/`),
+  extend: (sessionId: number, minutes: number = 15) =>
+    api.post(`/sessions/${sessionId}/extend/`, { minutes }),
+  reset: (sessionId: number) => api.post(`/sessions/${sessionId}/reset/`),
 };
 
 // ─── Submissions ──────────────────────────────────────────────────────────────

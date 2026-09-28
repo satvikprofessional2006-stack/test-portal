@@ -455,3 +455,81 @@ class AdminTerminateSessionView(APIView):
             "Admin %d terminated session %d", request.user.pk, session_id,
         )
         return Response({"success": True, "data": {"status": "terminated"}})
+
+
+class AdminExtendSessionView(APIView):
+    """
+    POST /api/v1/sessions/{session_id}/extend/
+    Admin extends time (in minutes) for a student's session.
+    """
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def post(self, request, session_id):
+        import datetime
+        try:
+            session = ExamSession.objects.get(pk=session_id)
+        except ExamSession.DoesNotExist:
+            return Response(
+                {"success": False, "errors": {"detail": "Session not found."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        minutes = int(request.data.get("minutes", 15))
+        now = timezone.now()
+        base_time = max(session.expires_at, now)
+        session.expires_at = base_time + datetime.timedelta(minutes=minutes)
+        if session.status in [ExamSession.Status.TIMED_OUT, ExamSession.Status.TERMINATED]:
+            session.status = ExamSession.Status.ACTIVE
+            session.completed_at = None
+        session.save(update_fields=["expires_at", "status", "completed_at"])
+
+        SecurityEvent.log(
+            session=session,
+            event_type="time_extended",
+            payload={"extended_by": request.user.pk, "minutes_added": minutes},
+            source="server",
+        )
+        logger.info("Admin %d extended session %d by %d minutes", request.user.pk, session_id, minutes)
+        return Response({
+            "success": True,
+            "data": {
+                "session_id": session.pk,
+                "seconds_remaining": session.seconds_remaining,
+                "expires_at": session.expires_at.isoformat(),
+                "status": session.status,
+            }
+        })
+
+
+class AdminResetSessionView(APIView):
+    """
+    POST /api/v1/sessions/{session_id}/reset/
+    Admin resets a student's session/enrollment to allow a clean re-entry.
+    """
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def post(self, request, session_id):
+        try:
+            session = ExamSession.objects.get(pk=session_id)
+        except ExamSession.DoesNotExist:
+            return Response(
+                {"success": False, "errors": {"detail": "Session not found."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        enrollment = session.enrollment
+        session.status = ExamSession.Status.TIMED_OUT
+        session.completed_at = timezone.now()
+        session.save(update_fields=["status", "completed_at"])
+
+        enrollment.status = ExamEnrollment.Status.ENROLLED
+        enrollment.completed_at = None
+        enrollment.final_score = None
+        enrollment.save(update_fields=["status", "completed_at", "final_score"])
+
+        logger.info("Admin %d reset enrollment %d (session %d)", request.user.pk, enrollment.pk, session_id)
+        return Response({
+            "success": True,
+            "data": {"detail": "Session reset. Student may enter the exam afresh."}
+        })
+

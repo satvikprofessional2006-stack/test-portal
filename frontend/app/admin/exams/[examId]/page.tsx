@@ -76,11 +76,10 @@ export default function ExamDetailPage({ params }: { params: Promise<{ examId: s
   const fetchExamDetails = async () => {
     try {
       setLoading(true);
-      const res = await examsApi.list();
-      const list = res.data.results || res.data || [];
-      const current = list.find((e: any) => e.id === examId);
+      const res = await examsApi.get(examId);
+      const current = res.data.data || res.data;
 
-      if (!current) {
+      if (!current || !current.id) {
         toast.error("Exam not found");
         router.push("/admin/exams");
         return;

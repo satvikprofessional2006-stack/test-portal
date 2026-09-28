@@ -52,27 +52,93 @@ interface Session {
 }
 
 const LANG_MAP: Record<string, string> = {
-  cpp17: "cpp",
+  python: "python",
   python3: "python",
+  javascript: "javascript",
+  js: "javascript",
+  cpp: "cpp",
+  cpp17: "cpp",
+  c: "c",
   java: "java",
 };
 
 const LANG_DEFAULT: Record<string, string> = {
-  cpp17: `#include <bits/stdc++.h>
+  python: `# Write your Python solution here
+import sys
+
+def main():
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    # Read inputs and print result
+    print(" ".join(input_data))
+
+if __name__ == '__main__':
+    main()
+`,
+  python3: `# Write your Python solution here
+import sys
+
+def main():
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    print(" ".join(input_data))
+
+if __name__ == '__main__':
+    main()
+`,
+  javascript: `// Write your JavaScript solution here
+const fs = require('fs');
+
+function main() {
+    const input = fs.readFileSync(0, 'utf-8').trim();
+    console.log(input);
+}
+
+main();
+`,
+  cpp: `#include <iostream>
+#include <vector>
+#include <string>
 using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    // your code here
+    return 0;
+}
+`,
+  cpp17: `#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    // your code here
+    return 0;
+}
+`,
+  c: `#include <stdio.h>
+#include <stdlib.h>
+
 int main() {
     // your code here
     return 0;
-}`,
-  python3: `# your code here
+}
 `,
-  java: `import java.util.*;
+  java: `import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         // your code here
     }
-}`,
+}
+`,
 };
 
 function formatTime(seconds: number) {
@@ -177,7 +243,12 @@ export default function ExamPage() {
           [questionId]: { ...(prev[questionId] || {}), [primary.language]: primary.code },
         }));
       } else {
-        setLanguage(defaultLang);
+        const lang = defaultLang || "python";
+        setLanguage(lang);
+        setCode(prev => ({
+          ...prev,
+          [questionId]: { ...(prev[questionId] || {}), [lang]: LANG_DEFAULT[lang] || "" },
+        }));
       }
     } catch {}
   };
@@ -341,7 +412,8 @@ export default function ExamPage() {
         if (attempts > 30) { clearInterval(poll); setRunLoading(false); }
       }, 1000);
     } catch (err: any) {
-      toast.error("Run failed. Please try again.");
+      const msg = err?.response?.data?.errors?.detail || err?.response?.data?.detail || "Run failed. Please check your code and session.";
+      toast.error(msg);
       setRunLoading(false);
     }
   };
@@ -585,21 +657,39 @@ export default function ExamPage() {
               </button>
               <button
                 onClick={handleRun}
-                disabled={runLoading}
-                className="flex items-center gap-1.5 text-xs bg-card hover:bg-card/80 border border-border/70 hover:border-emerald-500/50 text-emerald-500 px-3.5 py-1.5 rounded-xl transition-all font-semibold disabled:opacity-50 cursor-pointer shadow-xs"
+                disabled={runLoading || submitLoading || (secondsLeft !== null && secondsLeft <= 0)}
+                className="flex items-center gap-1.5 text-xs bg-card hover:bg-card/80 border border-border/70 hover:border-emerald-500/50 text-emerald-500 px-3.5 py-1.5 rounded-xl transition-all font-semibold disabled:opacity-50 cursor-pointer shadow-xs disabled:cursor-not-allowed"
+                title={secondsLeft !== null && secondsLeft <= 0 ? "Session expired" : "Run code against custom input"}
               >
                 {runLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                 Run
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={submitLoading}
-                className="flex items-center gap-1.5 text-xs bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-1.5 rounded-xl transition-all font-semibold disabled:opacity-50 shadow-md cursor-pointer"
+                disabled={submitLoading || runLoading || (secondsLeft !== null && secondsLeft <= 0)}
+                className="flex items-center gap-1.5 text-xs bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-1.5 rounded-xl transition-all font-semibold disabled:opacity-50 shadow-md cursor-pointer disabled:cursor-not-allowed"
+                title={secondsLeft !== null && secondsLeft <= 0 ? "Session expired" : "Submit solution for scoring"}
               >
                 {submitLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                 Submit
               </button>
             </div>
+
+            {/* Expired Session Notice Banner */}
+            {secondsLeft !== null && secondsLeft <= 0 && (
+              <div className="bg-red-950/80 border-b border-red-800/60 text-red-200 text-xs px-4 py-2.5 flex items-center justify-between gap-3 shrink-0">
+                <span className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                  Your exam session has expired. Code execution and submissions are closed.
+                </span>
+                <button
+                  onClick={() => router.push("/student/exams")}
+                  className="px-3 py-1 bg-red-900 hover:bg-red-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0"
+                >
+                  Return to Dashboard
+                </button>
+              </div>
+            )}
 
             {/* Monaco Editor */}
             <div className="flex-1 min-h-0">

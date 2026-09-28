@@ -30,11 +30,29 @@ logger = logging.getLogger(__name__)
 # ─── Language specifications ──────────────────────────────────────────────────
 
 LANGUAGE_SPECS = {
+    "cpp": {
+        "extension": ".cpp",
+        "compile": ["g++", "-std=c++17", "-O2", "-o", "{binary}", "{source}"],
+        "run": ["{binary}"],
+        "compiled": True,
+    },
     "cpp17": {
         "extension": ".cpp",
         "compile": ["g++", "-std=c++17", "-O2", "-o", "{binary}", "{source}"],
         "run": ["{binary}"],
         "compiled": True,
+    },
+    "c": {
+        "extension": ".c",
+        "compile": ["gcc", "-O2", "-o", "{binary}", "{source}"],
+        "run": ["{binary}"],
+        "compiled": True,
+    },
+    "python": {
+        "extension": ".py",
+        "compile": None,
+        "run": [sys.executable, "{source}"],
+        "compiled": False,
     },
     "python3": {
         "extension": ".py",
@@ -42,10 +60,21 @@ LANGUAGE_SPECS = {
         "run": [sys.executable, "{source}"],
         "compiled": False,
     },
+    "javascript": {
+        "extension": ".js",
+        "compile": None,
+        "run": ["node", "{source}"],
+        "compiled": False,
+    },
+    "js": {
+        "extension": ".js",
+        "compile": None,
+        "run": ["node", "{source}"],
+        "compiled": False,
+    },
     "java": {
         "extension": ".java",
         "compile": ["javac", "{source}"],
-        # Java runs the class named Main — student must name their class Main
         "run": ["java", "-cp", "{workdir}", "Main"],
         "compiled": True,
         "source_filename": "Main",  # must match public class name
@@ -71,13 +100,25 @@ def _run_subprocess(cmd, stdin_data, timeout_s, memory_limit_mb, output_limit_by
     """
 
     def set_limits():
-        # Memory limit (virtual address space)
-        limit_bytes = memory_limit_mb * 1024 * 1024
-        resource.setrlimit(resource.RLIMIT_AS, (limit_bytes, limit_bytes))
-        # Prevent fork bombs
-        resource.setrlimit(resource.RLIMIT_NPROC, (64, 64))
-        # Limit file size written (OLE protection)
-        resource.setrlimit(resource.RLIMIT_FSIZE, (output_limit_bytes, output_limit_bytes))
+        try:
+            # Memory limit (virtual address space) — supported on Linux; on macOS RLIMIT_AS cannot be lowered without error
+            if sys.platform.startswith("linux"):
+                limit_bytes = memory_limit_mb * 1024 * 1024
+                resource.setrlimit(resource.RLIMIT_AS, (limit_bytes, limit_bytes))
+        except Exception:
+            pass
+
+        try:
+            # Prevent fork bombs
+            resource.setrlimit(resource.RLIMIT_NPROC, (128, 128))
+        except Exception:
+            pass
+
+        try:
+            # Limit file size written (OLE protection)
+            resource.setrlimit(resource.RLIMIT_FSIZE, (output_limit_bytes, output_limit_bytes))
+        except Exception:
+            pass
 
     start = time.perf_counter()
     try:

@@ -7,7 +7,7 @@ import { sessionsApi } from "@/lib/api";
 import toast from "react-hot-toast";
 import {
   Activity, Clock, ShieldAlert, RefreshCw, AlertTriangle,
-  StopCircle, CheckCircle, Wifi, WifiOff, Search
+  StopCircle, CheckCircle, Wifi, WifiOff, Search, PlusCircle, RotateCcw
 } from "lucide-react";
 
 interface ActiveSession {
@@ -81,6 +81,29 @@ export default function AdminLiveSessionsPage() {
       toast.error(err.response?.data?.errors?.detail || "Failed to terminate session");
     } finally {
       setTerminatingId(null);
+    }
+  };
+
+  const handleExtend = async (sessionId: number, studentName: string) => {
+    try {
+      await sessionsApi.extend(sessionId, 15);
+      toast.success(`Added 15 minutes to ${studentName}'s session.`);
+      fetchActiveSessions(false);
+    } catch (err: any) {
+      toast.error(err.response?.data?.errors?.detail || "Failed to extend session");
+    }
+  };
+
+  const handleReset = async (sessionId: number, studentName: string) => {
+    if (!window.confirm(`Reset exam session for ${studentName}? This allows them to enter and start the exam afresh.`)) {
+      return;
+    }
+    try {
+      await sessionsApi.reset(sessionId);
+      toast.success(`Exam session reset for ${studentName}. Candidate can enter afresh.`);
+      fetchActiveSessions(false);
+    } catch (err: any) {
+      toast.error(err.response?.data?.errors?.detail || "Failed to reset session");
     }
   };
 
@@ -273,10 +296,24 @@ export default function AdminLiveSessionsPage() {
                     </td>
 
                     <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => handleExtend(session.session_id, session.student_name)}
+                          className="px-2 py-1 rounded-lg text-[11px] font-medium bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 hover:bg-emerald-900/50 transition-colors flex items-center gap-1 cursor-pointer"
+                          title="Add 15 minutes to session"
+                        >
+                          <PlusCircle className="w-3 h-3" /> +15m
+                        </button>
+                        <button
+                          onClick={() => handleReset(session.session_id, session.student_name)}
+                          className="px-2 py-1 rounded-lg text-[11px] font-medium bg-blue-950/40 text-blue-400 border border-blue-800/40 hover:bg-blue-900/50 transition-colors flex items-center gap-1 cursor-pointer"
+                          title="Reset student session to allow re-entry"
+                        >
+                          <RotateCcw className="w-3 h-3" /> Reset
+                        </button>
                         <Link
                           href={`/admin/security?session_id=${session.session_id}`}
-                          className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-[#131c2e] text-slate-300 border border-[#1e2d47] hover:border-slate-500 transition-colors flex items-center gap-1"
+                          className="px-2 py-1 rounded-lg text-[11px] font-medium bg-[#131c2e] text-slate-300 border border-[#1e2d47] hover:border-slate-500 transition-colors flex items-center gap-1"
                           title="View security events"
                         >
                           <ShieldAlert className="w-3 h-3 text-amber-400" /> Logs
@@ -286,7 +323,7 @@ export default function AdminLiveSessionsPage() {
                             handleTerminate(session.session_id, session.student_name)
                           }
                           disabled={terminatingId === session.session_id}
-                          className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-red-950/40 text-red-400 border border-red-800/40 hover:bg-red-900/50 transition-colors flex items-center gap-1 disabled:opacity-50"
+                          className="px-2 py-1 rounded-lg text-[11px] font-medium bg-red-950/40 text-red-400 border border-red-800/40 hover:bg-red-900/50 transition-colors flex items-center gap-1 disabled:opacity-50 cursor-pointer"
                         >
                           <StopCircle className="w-3 h-3" /> Terminate
                         </button>

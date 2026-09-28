@@ -30,7 +30,7 @@ CACHES = {
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_BROKER_URL = "memory://"
-CELERY_RESULT_BACKEND = "cache+locmem://"
+CELERY_RESULT_BACKEND = "cache+memory://"
 
 # CORS settings for frontend running on localhost:3000
 CORS_ALLOW_ALL_ORIGINS = True

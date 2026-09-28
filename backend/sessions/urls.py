@@ -10,6 +10,8 @@ from .views import (
     CompleteExamView,
     AdminActiveSessionsView,
     AdminTerminateSessionView,
+    AdminExtendSessionView,
+    AdminResetSessionView,
 )
 
 urlpatterns = [
@@ -24,4 +26,6 @@ urlpatterns = [
     # Admin
     path("active/", AdminActiveSessionsView.as_view(), name="admin-active-sessions"),
     path("<int:session_id>/terminate/", AdminTerminateSessionView.as_view(), name="admin-terminate-session"),
+    path("<int:session_id>/extend/", AdminExtendSessionView.as_view(), name="admin-extend-session"),
+    path("<int:session_id>/reset/", AdminResetSessionView.as_view(), name="admin-reset-session"),
 ]
