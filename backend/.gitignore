@@ -1,0 +1,11 @@
+# Exam Portal — Backend
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.log
+staticfiles/
+media/
+.DS_Store
+db.sqlite3
