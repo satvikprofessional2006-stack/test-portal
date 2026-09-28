@@ -20,10 +20,12 @@ def custom_exception_handler(exc, context):
             "errors": response.data,
         }
         response.data = error_data
+        request = context.get("request")
+        path = getattr(request, "path", "unknown") if request else "unknown"
         logger.warning(
             "API error %s on %s: %s",
             response.status_code,
-            context.get("request", {}).get("path", "unknown"),
+            path,
             exc,
         )
 
