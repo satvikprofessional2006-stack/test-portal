@@ -417,34 +417,41 @@ export default function ExamPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0e1a]">
       {/* ── Top Bar ─────────────────────────────────────────────────────────── */}
-      <header className="h-14 border-b border-[#1e2d47] bg-[#0a0e1a]/95 backdrop-blur flex items-center px-4 gap-4 sticky top-0 z-50">
-        {/* Exam title */}
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <Code2 className="w-4 h-4 text-blue-400 shrink-0" />
-          <span className="text-sm font-semibold text-slate-200 truncate">{exam.title}</span>
+      <header className="h-14 border-b border-border/60 bg-card/70 backdrop-blur flex items-center px-4 gap-4 sticky top-0 z-50">
+        {/* University logo + Exam title */}
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <img
+            src="/Rishihood_University_idxo_lfgcw_2.png"
+            alt="RU Logo"
+            className="h-7 w-7 object-contain shrink-0"
+          />
+          <div className="min-w-0">
+            <span className="text-sm font-bold text-foreground truncate block">{exam.title}</span>
+            <span className="text-[10px] text-primary font-semibold block uppercase tracking-wider">Candidate Workspace</span>
+          </div>
         </div>
 
         {/* Timer */}
         <div className={`flex items-center gap-2 px-4 py-1.5 rounded-xl border font-mono text-sm font-bold
           ${isDanger
-            ? "border-red-500/50 bg-red-900/20 text-red-400 timer-danger"
-            : "border-[#1e2d47] bg-[#0f1629] text-slate-200"
+            ? "border-primary/50 bg-primary/15 text-primary animate-pulse"
+            : "border-border/60 bg-card text-foreground"
           }`}>
           <Clock className="w-3.5 h-3.5" />
           {formatTime(secondsLeft)}
         </div>
 
         {/* Save status */}
-        <div className="text-xs text-slate-600 flex items-center gap-1.5">
+        <div className="text-xs text-muted-foreground flex items-center gap-1.5">
           {saveStatus === "saving" && <><Loader2 className="w-3 h-3 animate-spin" /> Saving...</>}
-          {saveStatus === "saved" && <><CheckCircle className="w-3 h-3 text-emerald-600" /> Saved</>}
-          {saveStatus === "unsaved" && <><span className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> Unsaved</>}
+          {saveStatus === "saved" && <><CheckCircle className="w-3 h-3 text-emerald-500" /> Saved</>}
+          {saveStatus === "unsaved" && <><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Unsaved</>}
         </div>
 
         {/* End exam */}
         <button
           onClick={handleCompleteExam}
-          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-red-400 border border-[#1e2d47] hover:border-red-500/50 px-3 py-1.5 rounded-lg transition-all"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive border border-border/60 hover:border-destructive/50 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
         >
           <LogOut className="w-3.5 h-3.5" /> End Exam
         </button>
@@ -452,15 +459,15 @@ export default function ExamPage() {
 
       <div className="flex flex-1 min-h-0">
         {/* ── Question Nav Sidebar ──────────────────────────────────────────── */}
-        <aside className="w-14 border-r border-[#1e2d47] bg-[#0f1629] flex flex-col items-center py-4 gap-2">
+        <aside className="w-14 border-r border-border/60 bg-card/40 flex flex-col items-center py-4 gap-2">
           {exam.questions.map((q, i) => (
             <button
               key={q.id}
               onClick={() => handleQuestionChange(i)}
-              className={`w-9 h-9 rounded-lg text-xs font-semibold transition-all
+              className={`w-9 h-9 rounded-xl text-xs font-semibold transition-all cursor-pointer
                 ${i === currentQ
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
-                  : "text-slate-500 hover:bg-[#1a2540] hover:text-slate-300"
+                  ? "bg-primary text-primary-foreground shadow-sm font-bold"
+                  : "text-muted-foreground hover:bg-card hover:text-foreground"
                 }`}
             >
               {q.order}
@@ -559,11 +566,11 @@ export default function ExamPage() {
           {/* Editor + Output Panel */}
           <div className="flex-1 flex flex-col min-h-0">
             {/* Editor toolbar */}
-            <div className="h-11 border-b border-[#1e2d47] bg-[#0f1629] flex items-center px-4 gap-3">
+            <div className="h-12 border-b border-border/60 bg-card/60 flex items-center px-4 gap-3">
               <select
                 value={language}
                 onChange={e => handleLanguageChange(e.target.value)}
-                className="text-xs bg-[#141c2e] border border-[#1e2d47] text-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-500 font-mono"
+                className="text-xs bg-card border border-border/70 text-foreground rounded-xl px-3 py-1.5 focus:outline-none focus:border-primary font-mono cursor-pointer shadow-xs"
               >
                 {langs.map(lang => (
                   <option key={lang} value={lang}>{lang}</option>
@@ -572,14 +579,14 @@ export default function ExamPage() {
               <span className="flex-1" />
               <button
                 onClick={() => triggerAutosave()}
-                className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2 py-1"
               >
                 <Save className="w-3.5 h-3.5" /> Save
               </button>
               <button
                 onClick={handleRun}
                 disabled={runLoading}
-                className="flex items-center gap-1.5 text-xs bg-[#141c2e] hover:bg-[#1a2540] border border-[#1e2d47] hover:border-emerald-500/50 text-emerald-400 px-3 py-1.5 rounded-lg transition-all font-medium disabled:opacity-50"
+                className="flex items-center gap-1.5 text-xs bg-card hover:bg-card/80 border border-border/70 hover:border-emerald-500/50 text-emerald-500 px-3.5 py-1.5 rounded-xl transition-all font-semibold disabled:opacity-50 cursor-pointer shadow-xs"
               >
                 {runLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                 Run
@@ -587,7 +594,7 @@ export default function ExamPage() {
               <button
                 onClick={handleSubmit}
                 disabled={submitLoading}
-                className="flex items-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition-all font-medium disabled:opacity-50 shadow-lg shadow-blue-900/30"
+                className="flex items-center gap-1.5 text-xs bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-1.5 rounded-xl transition-all font-semibold disabled:opacity-50 shadow-md cursor-pointer"
               >
                 {submitLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                 Submit

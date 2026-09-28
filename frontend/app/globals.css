@@ -1,129 +1,181 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
-:root {
-  --bg-primary: #0a0e1a;
-  --bg-secondary: #0f1629;
-  --bg-card: #141c2e;
-  --bg-elevated: #1a2540;
-  --border: #1e2d47;
-  --border-bright: #2a3f5f;
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --accent-glow: rgba(59, 130, 246, 0.15);
-  --success: #10b981;
-  --error: #ef4444;
-  --warning: #f59e0b;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
+@layer base {
+  :root {
+    /* Light Mode Palette: #FFEDD2 background, #191919 text/surfaces, #CC0033 primary red */
+    --background: 36 100% 93%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    /* Primary Red = #CC0033 */
+    --primary: 345 100% 40%;
+    --primary-foreground: 36 100% 95%;
+
+    /* Secondary = #FFEDD2 */
+    --secondary: 36 80% 86%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 36 40% 88%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 36 60% 90%;
+    --accent-foreground: 0 0% 10%;
+
+    /* Destructive = #CC0033 */
+    --destructive: 345 100% 40%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 36 30% 82%;
+    --input: 36 30% 82%;
+    --ring: 345 100% 40%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark Mode Palette: #1f1f1f dark gray bg, #292929 card surfaces, #FFEDD2 warm text, #CC0033 primary red */
+    --background: 0 0% 12%;
+    --foreground: 36 100% 91%;
+
+    --card: 0 0% 16%;
+    --card-foreground: 36 100% 91%;
+
+    --popover: 0 0% 16%;
+    --popover-foreground: 36 100% 91%;
+
+    --primary: 345 100% 40%;
+    --primary-foreground: 36 100% 91%;
+
+    --secondary: 36 100% 91%;
+    --secondary-foreground: 0 0% 12%;
+
+    --muted: 0 0% 20%;
+    --muted-foreground: 36 40% 75%;
+
+    --accent: 0 0% 22%;
+    --accent-foreground: 36 100% 91%;
+
+    --destructive: 345 100% 40%;
+    --destructive-foreground: 36 100% 91%;
+
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 345 100% 40%;
+  }
 }
 
-* {
-  box-sizing: border-box;
+@theme {
+  --font-sans: var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-montserrat), 'Montserrat', monospace;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
 }
 
-html, body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+}
+
+/* Glass styling */
+.glass {
+  background-color: hsl(var(--card) / 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 0.8);
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
 
 /* Code font */
-code, pre, .font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
-
-/* Glass card */
-.glass {
-  background: rgba(20, 28, 46, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-}
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+code, pre, .font-mono { font-family: var(--font-montserrat), monospace; }
 
 /* Verdict badges */
 .verdict-accepted {
-  background-color: rgba(6, 78, 59, 0.4);
-  color: #34d399;
-  border: 1px solid rgba(4, 120, 87, 0.5);
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 .verdict-wrong_answer {
-  background-color: rgba(127, 29, 29, 0.4);
-  color: #f87171;
-  border: 1px solid rgba(185, 28, 28, 0.5);
+  background-color: rgba(204, 0, 51, 0.15);
+  color: #CC0033;
+  border: 1px solid rgba(204, 0, 51, 0.3);
 }
 .verdict-tle {
-  background-color: rgba(113, 63, 18, 0.4);
-  color: #facc15;
-  border: 1px solid rgba(161, 98, 7, 0.5);
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 .verdict-mle {
-  background-color: rgba(124, 45, 18, 0.4);
-  color: #fb923c;
-  border: 1px solid rgba(194, 65, 12, 0.5);
+  background-color: rgba(234, 88, 12, 0.15);
+  color: #ea580c;
+  border: 1px solid rgba(234, 88, 12, 0.3);
 }
 .verdict-compilation_error {
-  background-color: rgba(88, 28, 135, 0.4);
-  color: #c084fc;
-  border: 1px solid rgba(126, 34, 206, 0.5);
+  background-color: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.3);
 }
 .verdict-runtime_error {
-  background-color: rgba(127, 29, 29, 0.4);
-  color: #f87171;
-  border: 1px solid rgba(185, 28, 28, 0.5);
+  background-color: rgba(204, 0, 51, 0.15);
+  color: #CC0033;
+  border: 1px solid rgba(204, 0, 51, 0.3);
 }
 .verdict-pending {
-  background-color: rgba(15, 23, 42, 0.4);
+  background-color: rgba(100, 116, 139, 0.15);
   color: #94a3b8;
-  border: 1px solid rgba(51, 65, 85, 0.5);
+  border: 1px solid rgba(100, 116, 139, 0.3);
 }
 .verdict-running {
-  background-color: rgba(30, 58, 138, 0.4);
-  color: #60a5fa;
-  border: 1px solid rgba(29, 78, 216, 0.5);
+  background-color: rgba(204, 0, 51, 0.15);
+  color: #CC0033;
+  border: 1px solid rgba(204, 0, 51, 0.3);
 }
 
 /* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-}
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% { box-shadow: 0 0 0 0 rgba(204, 0, 51, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(204, 0, 51, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(204, 0, 51, 0); }
 }
 
-.animate-fade-in { animation: fadeIn 0.3s ease-out; }
 .animate-pulse-ring { animation: pulse-ring 2s infinite; }
-
-.skeleton {
-  background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--border) 50%, var(--bg-elevated) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* Timer danger state */
-.timer-danger { color: #ef4444; animation: pulse-ring 1s infinite; }
-
-/* Monaco editor container */
-.monaco-container { border-radius: 8px; overflow: hidden; }
